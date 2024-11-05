@@ -5,6 +5,7 @@ import torch.optim as optim
 import pytorch_lightning as pl
 from pytorch_lightning import Trainer
 from pytorch_lightning.loggers import CSVLogger
+from pytorch_lightning.callbacks import ModelCheckpoint
 from torchvision import models, transforms, datasets
 from torchvision.models import ResNet18_Weights
 from torch.utils.data import DataLoader, random_split
@@ -78,7 +79,16 @@ else:
 # CSVLoggerの設定
 csv_logger = CSVLogger("logs", name="weather_classification")
 
-trainer = Trainer(max_epochs=3, accelerator=accelerator, devices=1, logger=csv_logger)
+
+# ModelCheckpointの設定
+checkpoint_callback = ModelCheckpoint(
+    monitor="val_loss",
+    dirpath="checkpoints",
+    filename="weather-classifier",
+    mode="min",
+)
+
+trainer = Trainer(max_epochs=5, accelerator=accelerator, devices=1, logger=csv_logger, callbacks=[checkpoint_callback])
 
 if __name__ == "__main__":
     # モデルのトレーニング

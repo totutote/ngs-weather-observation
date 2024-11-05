@@ -11,3 +11,5 @@ dependencies:
   - torchinfo
   - numpy
   - opencv
+  - pip:
+      - pyautogui

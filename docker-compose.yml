@@ -9,3 +9,4 @@ services:
     environment:
       - JUPYTER_ENABLE_LAB=yes  # 必要に応じて環境変数を設定
     command: ["conda", "run", "--no-capture-output", "-n", "ngswether", "jupyter", "notebook", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root"]
+    shm_size: '1g'  # 共有メモリサイズを設定
