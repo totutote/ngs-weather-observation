@@ -3,7 +3,7 @@ FROM condaforge/miniforge3
 
 COPY environment.yml /tmp/environment.yml
 
-RUN conda update conda && conda env create -f /tmp/environment.yml && conda clean -afy
+RUN conda update conda && conda env create --file /tmp/environment.yml && conda clean -afy
 
 # 環境変数の設定
 ENV LD_PRELOAD=/opt/conda/envs/ngswether/lib/python3.10/site-packages/cv2/python-3.10/../../../.././libgomp.so.1
