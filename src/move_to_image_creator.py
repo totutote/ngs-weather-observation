@@ -3,7 +3,7 @@ import cv2
 
 base_dir = './content/original_video/'
 output_dir = './content/dataimagegenerator_input/'
-max_height = 256  # 変換後画像の高さ
+short_side_length = 256  # 変換後画像の短辺の長さ
 frame_interval_sec = 0.1  # フレームを抽出する間隔（秒）
 
 # Get the list of label directories
@@ -29,6 +29,7 @@ for label in label_dirs:
 
         # Iterate over each frame in the video
         frame_count = 0
+        print('')
         while cap.isOpened():
             ret, frame = cap.read()
             if not ret:
@@ -36,19 +37,23 @@ for label in label_dirs:
 
             # Check if the current frame is at the specified interval
             if frame_count % frame_interval == 0:
-                # Resize the frame to have a maximum height of max_height pixels while maintaining the aspect ratio
+                # Resize the frame to have the specified short side length while maintaining the aspect ratio
                 height, width = frame.shape[:2]
-                if height > max_height:
-                    new_height = max_height
+                if height < width:
+                    new_height = short_side_length
                     new_width = int((new_height / height) * width)
-                    frame = cv2.resize(frame, (new_width, new_height))
+                else:
+                    new_width = short_side_length
+                    new_height = int((new_width / width) * height)
+                frame = cv2.resize(frame, (new_width, new_height))
 
                 # Convert the frame to JPG format
                 output_file = os.path.join(output_label_dir, f'{video_file}_{frame_count}.jpg')
                 cv2.imwrite(output_file, frame)
 
             frame_count += 1
+            print(f'{video_file} Processed frame count: {frame_count}', end='\r')
 
         cap.release()
 
-print('Video files converted to JPG format and resized to a maximum height of', max_height, 'pixels at intervals of', frame_interval_sec, 'seconds.')
+print('Video files converted to JPG format and resized to a short side length of', short_side_length, 'pixels at intervals of', frame_interval_sec, 'seconds.')
