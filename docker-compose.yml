@@ -1,12 +1,12 @@
 services:
-  jupyter:
-    build:
-      context: .  # Dockerfileのあるディレクトリ
-    ports:
-      - "8888:8888"  # ホストとコンテナのポートをマッピング
-    volumes:
-      - .:/home/jovyan/work  # カレントディレクトリをコンテナ内にマウント
+  app:
+    build: .
+    runtime: nvidia
     environment:
-      - JUPYTER_ENABLE_LAB=yes  # 必要に応じて環境変数を設定
-    command: ["conda", "run", "--no-capture-output", "-n", "ngswether", "jupyter", "notebook", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root"]
-    shm_size: '1g'  # 共有メモリサイズを設定
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+    volumes:
+      - .:/workdir
+    working_dir: /workdir
+    shm_size: '1g'
+    tty: true
