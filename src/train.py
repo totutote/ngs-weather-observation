@@ -34,8 +34,8 @@ val_test_transforms = transforms.Compose(
     ]
 )
 
-data_dir = "./content/dataimagegenerator_input/"
-full_dataset = datasets.ImageFolder(os.path.join(data_dir, "train"))
+data_dir = "./content/"
+full_dataset = datasets.ImageFolder(os.path.join(data_dir, "dataimagegenerator_input"))
 
 # データセットをランダムにシャッフルして分割
 full_size = len(full_dataset)

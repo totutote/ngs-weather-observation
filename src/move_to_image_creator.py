@@ -4,7 +4,7 @@ import cv2
 base_dir = './content/original_video/'
 output_dir = './content/dataimagegenerator_input/'
 short_side_length = 256  # 変換後画像の短辺の長さ
-frame_interval_sec = 0.1  # フレームを抽出する間隔（秒）
+frame_interval_sec = 0.5  # フレームを抽出する間隔（秒）
 
 # Get the list of label directories
 label_dirs = [label for label in os.listdir(base_dir) if os.path.isdir(os.path.join(base_dir, label))]
@@ -50,9 +50,9 @@ for label in label_dirs:
                 # Convert the frame to JPG format
                 output_file = os.path.join(output_label_dir, f'{video_file}_{frame_count}.jpg')
                 cv2.imwrite(output_file, frame)
+                print(f'{video_file} Processed frame count: {frame_count}', end='\r')
 
             frame_count += 1
-            print(f'{video_file} Processed frame count: {frame_count}', end='\r')
 
         cap.release()
 

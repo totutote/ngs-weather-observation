@@ -7,7 +7,7 @@ import pyautogui
 
 # モデルのチェックポイントを読み込む
 checkpoint_path = "checkpoints/weather-classifier.ckpt"
-model = WeatherClassifier.load_from_checkpoint(checkpoint_path, num_classes=10)
+model = WeatherClassifier.load_from_checkpoint(checkpoint_path, num_classes=2)
 model.eval()  # モデルを評価モードに設定
 
 # 画像の前処理
@@ -37,15 +37,19 @@ def capture_window(window_title, save_path):
     return image
 
 # 予測を行う
-window_title = "Your Application Window Title"
-image_path = "path/to/your/captured_image.jpg"
+window_title = "PHANTASY STAR ONLINE 2 NEW GENESIS"
+image_path = "content/predict_img/captured_image.jpg"
 image = capture_window(window_title, image_path)
+
+import torch.nn.functional as F
 
 # モデルを使って予測を行う
 with torch.no_grad():
     outputs = model(image)
+    probabilities = F.softmax(outputs, dim=1)
     _, predicted = torch.max(outputs, 1)
 
 predicted = predicted.item()
+probability = probabilities[0][predicted].item()
 
-print(f"Predicted class: {predicted}")
+print(f"Predicted class: {predicted}, Probability: {probability:.2f}")
