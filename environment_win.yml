@@ -1,0 +1,16 @@
+name: ngswether
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10.12
+  - jupyter
+  - numpy
+  - opencv
+  - pip
+  - pip:
+      - torch
+      - torchvision
+      - pytorch-lightning
+      - torchmetrics
+      - torchinfo
+      - pyautogui
