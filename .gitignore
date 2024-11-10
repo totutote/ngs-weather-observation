@@ -132,3 +132,4 @@ dmypy.json
 *.mp4
 *.jpg
 logs/*
+lightning_logs/*

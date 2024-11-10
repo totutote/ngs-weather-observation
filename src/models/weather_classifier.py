@@ -6,12 +6,15 @@ from torchvision import models
 from torchvision.models import ResNet18_Weights
 
 class WeatherClassifier(pl.LightningModule):
-    def __init__(self, num_classes):
+    def __init__(self, num_classes, lr=0.00017834007821395848, optimizer_class=optim.Adam):
         super(WeatherClassifier, self).__init__()
         self.model = models.resnet18(weights=ResNet18_Weights.IMAGENET1K_V1)
         num_ftrs = self.model.fc.in_features
         self.model.fc = nn.Linear(num_ftrs, num_classes)
         self.criterion = nn.CrossEntropyLoss()
+
+        self.optimizer_class = optimizer_class
+        self.lr = lr
 
     def forward(self, x):
         return self.model(x)
@@ -43,6 +46,6 @@ class WeatherClassifier(pl.LightningModule):
         return loss
 
     def configure_optimizers(self):
-        optimizer = optim.Adam(self.parameters(), lr=0.001)
+        optimizer = self.optimizer_class(self.parameters(), self.lr)
         scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
         return [optimizer], [scheduler]
