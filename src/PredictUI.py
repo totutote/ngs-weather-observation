@@ -8,6 +8,7 @@ from tkinter import ttk
 import threading
 import time
 from predict import WeatherClassifierPredict
+import requests
 
 class WeatherClassifierApp:
     def __init__(self, root):
@@ -32,15 +33,29 @@ class WeatherClassifierApp:
         self.stop_button = ttk.Button(self.mainframe, text="Stop", command=self.stop_capture)
         self.stop_button.grid(column=1, row=5, sticky=(tk.W, tk.E))
 
-        self.interval = 10  # seconds
+        self.interval = 2  # seconds
         self.stop_event = None
         self.capture_thread = None
 
         # ウィンドウのタイトル
         self.window_title = "PHANTASY STAR ONLINE 2 NEW GENESIS"
 
+        # Discord Webhook URL
+        self.bad_count = 0
+        self.nomal_count = 0
+        self.discord_webhook_url = "Discord Webhook URL"
+
         # モデルの初期化
         self.model = WeatherClassifierPredict()
+
+    def send_discord_notification(self, message):
+        data = {
+            "content": message
+        }
+        response = requests.post(self.discord_webhook_url, json=data)
+        if response.status_code != 204:
+            print(f"Failed to send notification: {response.status_code}, {response.text}")
+
 
     def periodic_capture_and_predict(self, stop_event):
         while not stop_event.is_set():
@@ -59,9 +74,28 @@ class WeatherClassifierApp:
             result, probability = self.model.predict(resized_screenshot)
             
             # UIの更新
-            self.label.config(text=f"Predicted class: {result}")
+            self.label.config(text=f"Predicted class: {'悪天候' if result == 0 else '通常' if result == 1 else result}")
             self.prob_label.config(text=f"Probability: {probability}")
-            
+
+            # 予測結果が高確率で悪天候の場合にDiscordに通知
+            if result == 0 and probability > 0.95:
+                self.bad_count += 1
+                self.nomal_count = 0
+            elif result == 1 and probability > 0.95:
+                self.nomal_count += 1
+                self.bad_count = 0
+            else:
+                self.bad_count = 0
+                self.nomal_count = 0
+
+            if self.bad_count == 3:
+                self.bad_count = 4
+                self.nomal_count = 0
+                self.send_discord_notification("悪天候が予測されました！")
+
+            if self.nomal_count == 3:
+                self.bad_count = 0
+
             # スクリーンショットをPIL ImageからTkinter Imageに変換して表示
             img = ImageTk.PhotoImage(resized_screenshot)
             self.image_label.config(image=img)
